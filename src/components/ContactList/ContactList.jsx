@@ -1,26 +1,51 @@
-import { useSelector } from 'react-redux';
-import { getContacts, getFilterValue } from '../../redux/selectors';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  selectError,
+  selectFilteredContacts,
+  selectIsLoading,
+} from '../../redux/selectors';
+import { deleteContacts, fetchContacts } from '../../redux/operations';
 
 import { ContactListItem } from 'components/ContactListItem/ContactListItem';
 import { ListContainer } from './ContactList.styled';
+import { useEffect } from 'react';
+import { Loader } from 'components/Loader/Loader';
 
 export const ContactList = () => {
-  const contacts = useSelector(getContacts);
-  const filter = useSelector(getFilterValue);
+  const dispatch = useDispatch();
+  const isLoading = useSelector(selectIsLoading);
+  const isError = useSelector(selectError);
+  const filteredContacts = useSelector(selectFilteredContacts);
 
-  const FilteredContacts = () => {
-    return contacts.filter(({ name }) =>
-      name.toLowerCase().includes(filter.toLowerCase())
-    );
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
+  const handleDeleteContact = id => {
+    dispatch(deleteContacts(id));
   };
 
-  const filterContacts = FilteredContacts();
-
   return (
-    <ListContainer>
-      {filterContacts.map(({ id, name, number }) => {
-        return <ContactListItem key={id} name={name} number={number} id={id} />;
-      })}
-    </ListContainer>
+    <>
+      {isLoading && <Loader />}
+      {!filteredContacts.length && !isLoading && !isError && (
+        <p>There are no contacts</p>
+      )}
+      {filteredContacts.length > 0 && (
+        <ListContainer>
+          {filteredContacts.map(({ id, name, phone }) => {
+            return (
+              <ContactListItem
+                key={id}
+                name={name}
+                number={phone}
+                id={id}
+                onDelete={handleDeleteContact}
+              />
+            );
+          })}
+        </ListContainer>
+      )}
+    </>
   );
 };

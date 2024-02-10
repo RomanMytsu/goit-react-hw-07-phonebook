@@ -1,14 +1,6 @@
-import { useDispatch } from 'react-redux';
 import { ListItemButton, ListItemWrapper } from './ContactListItem.styled';
-import { deleteContact } from '../../redux/contactsSlice';
 
-export const ContactListItem = ({ name, number, id }) => {
-  const dispatch = useDispatch();
-
-  const handleDeleteContact = id => {
-    dispatch(deleteContact(id));
-  };
-
+export const ContactListItem = ({ name, number, id, onDelete }) => {
   return (
     <li>
       <ListItemWrapper>
@@ -18,7 +10,7 @@ export const ContactListItem = ({ name, number, id }) => {
         <ListItemButton
           type="button"
           onClick={() => {
-            handleDeleteContact(id);
+            onDelete(id);
           }}
         >
           Delete
